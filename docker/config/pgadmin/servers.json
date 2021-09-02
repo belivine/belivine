@@ -1,0 +1,14 @@
+{
+    "Servers": {
+        "1": {
+            "Name": "ine",
+            "Group": "Beliveine",
+            "Host": "ine_pgsql",
+            "Port": 5432,
+            "Username": "root",
+            "MaintenanceDB": "ine",
+            "SSLMode": "prefer"
+        }
+    }
+}
+

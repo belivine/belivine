@@ -1,0 +1,58 @@
+version: "3.9"
+
+networks: 
+  internal:  
+    external: false
+
+services: 
+  # Postgres
+  ine_pgsql:
+    container_name: ine_pgsql
+    build: 
+      context: ./images/pgsql
+    restart: "no"
+    volumes:
+      - ./logs/pgsql:/var/log/postgresql
+      - ./data/pgsql:/var/lib/postgresql/data
+      - ./backup:/var/backup
+    environment: 
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: ine
+    ports: 
+      - "127.0.0.1:5419:5432"
+    networks:
+      - internal
+  
+  #pg admin
+  ine_pgadmin:
+    container_name: ine_pgadmin
+    build: 
+      context: ./images/pgadmin
+    restart: "no"
+    environment: 
+      PGADMIN_DEFAULT_EMAIL: root@root.com
+      PGADMIN_DEFAULT_PASSWORD: root
+      PGADMIN_LISTEN_PORT: 5050
+    volumes:
+      - ./config/pgadmin/servers.json:/pgadmin4/servers.json
+    ports: 
+      - 5050:5050
+    networks:
+      - internal
+
+  # golang
+  ine_go:
+    container_name: ine_go
+    depends_on: 
+      - ine_pgsql
+    build: 
+      context: ./images/golang
+    restart: "no"
+    # entrypoint: RUN go mod download -x
+    volumes:
+      - ../server:/app
+    ports: 
+      - 8080:8080
+    networks:
+      - internal

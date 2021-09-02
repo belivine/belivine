@@ -1,0 +1,29 @@
+[
+    {
+        "title": "Home",
+        "icon": "mdi-clipboard-clock-outline",
+        "label": "Time Attandance",
+        "children" : [
+            {
+                "name": "Time Tracking",
+                "url" : "/time/tracking",
+                "icon": "mdi-clock",
+                "label": "Timer"
+            },
+            {
+                "name": "Reports Data",
+                "url" : "/time/reports",
+                "icon": "mdi-file-clock-outline",
+                "label": "Reports"
+            }
+        ]
+    },
+    {
+        "title": "My Account",
+        "icon": "mdi-account"
+    },
+    {
+        "title": "Users",
+        "icon": "mdi-account-group-outline"
+    }
+]
