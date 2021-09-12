@@ -1,41 +1,45 @@
 package users
 
 import (
+	"context"
+	"errors"
 	"log"
 
+	"github.com/neurocome/ine_go/graph/model"
 	"github.com/neurocome/ine_go/internal/pkg/db/pgsql"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
-	tableName struct{} `pg:"belivine.users"`
-	ID        int      `json:"id" pg:"id"`
-	Username  string   `json:"username" pg:"username"`
-	Password  string   `json:"password" pg:"password"`
+	ID       int
+	Username string
+	Email    string
+	Password string
 }
 
-func (user *User) Create() {
+func (user *User) Create() error {
 	hashedPassword, err := HashedPassowrd(user.Password)
 	if err != nil {
 		log.Fatal(err)
 	} else {
 		user.Password = hashedPassword
 	}
-	_, err = pgsql.Db.Model(user).Insert()
+	_, err = pgsql.Db.Exec(context.Background(), "INSERT INTO users (username, password, email) values($1, $2, $3)", user.Username, user.Password, user.Email)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
+	return nil
 }
 
 func GetUserByUsername(username string) (int, error) {
-	user := new(User)
-	err := pgsql.Db.Model(user).Where("username = ?", username).Select()
+	var ID int
+	err := pgsql.Db.QueryRow(context.Background(), "SELECT id FROM users WHERE username=$1", username).Scan(&ID)
 	if err != nil {
 		log.Println(err)
 		return 0, err
 	}
 
-	return user.ID, nil
+	return ID, nil
 }
 
 func HashedPassowrd(password string) (string, error) {
@@ -49,10 +53,24 @@ func CheckPasswordHash(password, hash string) bool {
 }
 
 func (user *User) Authenticate() bool {
-	row := new(User)
-	err := pgsql.Db.Model(row).Where("username = ?", user.Username).Select()
+	// row := new(User)
+	var password string
+
+	err := pgsql.Db.QueryRow(context.Background(), "SELECT password FROM users WHERE username=$1 OR email=$1", user.Username).Scan(&password)
+	log.Println(password)
 	if err != nil {
-		log.Println(err)
+		log.Println("dsfdsf", err)
 	}
-	return CheckPasswordHash(user.Password, row.Password)
+	return CheckPasswordHash(user.Password, password)
+}
+
+func GetProfile(id int) (model.User, error) {
+	log.Println(id)
+	var user model.User
+	err := pgsql.Db.QueryRow(context.Background(), "SELECT id,username,email FROM users where id = $1", id).Scan(&user.ID, &user.Username, &user.Email)
+	if err != nil {
+		return user, errors.New("User not found, please try to login again")
+	}
+
+	return user, nil
 }

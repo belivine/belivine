@@ -26,6 +26,7 @@ func main() {
 	router := chi.NewRouter()
 	router.Use(cors.New(cors.Options{
 		AllowedOrigins:   []string{"http://localhost:8081", "http://localhost:8080"},
+		AllowedHeaders:   []string{"Accept", "Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization"},
 		AllowCredentials: true,
 		Debug:            true,
 	}).Handler)
@@ -33,6 +34,7 @@ func main() {
 	router.Use(auth.Middleware())
 
 	db.InitDB()
+
 	server := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
 	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	router.Handle("/query", server)

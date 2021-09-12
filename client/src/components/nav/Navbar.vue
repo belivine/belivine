@@ -73,7 +73,7 @@
                   </v-row>
                 </v-subheader>
                 <!-- <v-divider></v-divider> -->
-                <v-list shaped>
+                <v-list>
                 <v-list-item-group
                   v-model="selectedSubMenu"
                   color="primary"
@@ -98,11 +98,10 @@
           </v-navigation-drawer>
         </div>
       </v-navigation-drawer>
-      <v-app-bar
+      <!-- <v-app-bar
         absolute
         app
         color="white"
-        elevate-on-scroll
         class="customAppBar"
         scroll-target="#scrolling-techniques-7"
       >
@@ -121,19 +120,11 @@
         <v-btn icon>
           <v-icon>mdi-dots-vertical</v-icon>
         </v-btn>
-      </v-app-bar>
+      </v-app-bar> -->
 
       <!-- Sizes your content based upon application components -->
       <v-main>
-         <v-sheet
-          id="scrolling-techniques-7"
-          class="overflow-y-auto"
-          max-height="calc(100vh - 100px)"
-        >
-          <v-container style="height: 1500px;">
-            <router-view></router-view>
-          </v-container>
-        </v-sheet>
+         <router-view></router-view>
       </v-main>
     </v-app>
   </div>
@@ -201,5 +192,9 @@ body{
 }
 .v-list-item__title {
   font-size: 0.9rem !important;
+}
+
+.v-sheet.v-toolbar:not(.v-sheet--outlined) {
+    box-shadow: 0px 0px 9px -6px!important;
 }
 </style>

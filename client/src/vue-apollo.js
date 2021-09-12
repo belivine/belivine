@@ -1,5 +1,7 @@
 import Vue from 'vue'
 import VueApollo from 'vue-apollo'
+import { setContext } from 'apollo-link-context'
+import cookie from 'vue-cookies'
 import { createApolloClient, restartWebsockets } from 'vue-cli-plugin-apollo/graphql-client'
 
 // Install the vue plugin
@@ -11,6 +13,18 @@ const AUTH_TOKEN = 'apollo-token'
 // Http endpoint
 // const httpEndpoint = process.env.VUE_APP_GRAPHQL_HTTP || 'http://localhost:4000/graphql'
 const httpEndpoint = 'http://localhost:8080/query'
+
+const authLink = setContext(async (_, { headers }) => {
+  // get the authentication token from local storage if it exists
+  const token = cookie.get("belivine")
+  // Return the headers to the context so httpLink can read them
+  return {
+    headers: {
+      ...headers,
+      authorization: token || ''
+    }
+  }
+})
 // Files URL root
 export const filesRoot = process.env.VUE_APP_FILES_ROOT || httpEndpoint.substr(0, httpEndpoint.indexOf('/graphql'))
 
@@ -37,7 +51,7 @@ const defaultOptions = {
   // Override default apollo link
   // note: don't override httpLink here, specify httpLink options in the
   // httpLinkOptions property of defaultOptions.
-  // link: myLink
+  link: authLink
 
   // Override default cache
   // cache: myCache
@@ -51,16 +65,27 @@ const defaultOptions = {
   // Client local data (see apollo-link-state)
   // clientState: { resolvers: { ... }, defaults: { ... } }
 }
+export const { apolloClient, wsClient } = createApolloClient({
+  ...defaultOptions,
+})
+
+apolloClient.wsClient = wsClient
 
 // Call this in the Vue app file
-export function createProvider (options = {}) {
-  // Create apollo client
-  const { apolloClient, wsClient } = createApolloClient({
-    ...defaultOptions,
-    ...options,
-  })
-  apolloClient.wsClient = wsClient
+export function createProvider () {
 
+  // const appoloProvider = new VueApollo({
+  //   defaultClient: apolloClient,
+  //   defaultOptions:  {
+  //     $query: {
+  //       fetchPolicy: "cache-and-network"
+  //     }
+  //   },
+  //   errorHandler (error) {
+  //     console.log('%cError', 'background: red; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold;', error.message)
+  //   }
+  // })
+  // Create apollo client
   // Create vue apollo provider
   const apolloProvider = new VueApollo({
     defaultClient: apolloClient,

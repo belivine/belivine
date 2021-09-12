@@ -2,24 +2,18 @@
 
 package model
 
-type Link struct {
-	ID      string `json:"id"`
-	Title   string `json:"title"`
-	Address string `json:"address"`
-	User    *User  `json:"user"`
-}
-
 type Login struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
-type NewLink struct {
-	Title   string `json:"title"`
-	Address string `json:"address"`
+type NewTime struct {
+	TaskID *int `json:"task_id"`
+	UserID int  `json:"user_id"`
 }
 
 type NewUser struct {
+	Email    string `json:"email"`
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
@@ -28,7 +22,18 @@ type RefreshTokenInput struct {
 	Token string `json:"token"`
 }
 
+type UpdateTime struct {
+	TimeID int `json:"time_id"`
+}
+
 type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	Email    *string `json:"email"`
+	Username string  `json:"username"`
+	ID       int64   `json:"id"`
+}
+
+type Task struct {
+	Name     string  `json:"name"`
+	EstHours *int    `json:"est_hours"`
+	EstDate  *string `json:"est_date"`
 }

@@ -1,26 +1,53 @@
-type Link {
+#schema for query
+
+type Time {
   id: ID!
-  title: String!
-  address: String!
-  user: User! 
+  start: Timestamp!
+  end: NullTime
+  task: Task!
+}
+
+type Task{
+  id: ID!
+  name: String!
+  est_hours: NullFloat64
+  est_date: NullTime
+  group_task: Group_task!
+}
+
+type Group_task {
+  id: NullInt64
+  name: NullString
 }
 
 type User {
-  id: ID!
+   email: String
+   username: String!
+   id: ID!
+}
+
+#end
+
+# Schema for Mutation
+input NewTime{
+  task_id: Int
+  user_id: Int!
+}
+input UpdateTime{
+  time_id: Int!
+}
+input task {
   name: String!
+  est_hours: Int
+  est_date: String
 }
-
-
-input NewLink {
-  title: String!
-  address: String!
-}
-
+# end
 input RefreshTokenInput {
   token: String!
 }
 
 input NewUser {
+  email: String!
   username: String!
   password: String!
 }
@@ -30,13 +57,31 @@ input Login {
   password: String!
 }
 
+# Custom Type
+scalar NullString
+scalar NullInt64
+scalar NullFloat64
+scalar NullTime
+scalar Timestamp
+
+
 type Query {
-  links: [Link!]
+  time(id: ID!): [Time]
+  get_profile: User
 }
 
+
 type Mutation {
-  createLink(input: NewLink!): Link!
   createUser(input: NewUser!): String!
+
+  # Auth
   login(input: Login!): String!
   refreshToken(input: RefreshTokenInput!): String!
+
+  # time
+  createTime(input: NewTime!): Time!
+  updateTime(input: UpdateTime!): Time!
+
+  # task
+  createTask(input: task): Task!
 }

@@ -17,13 +17,45 @@
             </v-col>
           </v-row>
           <v-list subheader two-line>
-            <v-subheader>Fri, 12 Aug</v-subheader>
+            <v-subheader class="d-flex justify-space-between align-center">
+                <div>
+                  Fri, 12 Aug
+                </div>
+                <div>
+                  <v-tooltip top>
+                    <template v-slot:activator="{ on, attrs }">
+                        <v-btn
+                          outlined
+                          x-small
+                          fab
+                          color="indigo"
+                          v-bind="attrs"
+                          v-on="on"
+                          @click="dialog = true"
+                        >
+                          <v-icon>mdi-plus</v-icon>
+                        </v-btn>
+                      </template>
+                    <span>Add task</span>
+                  </v-tooltip>
+                </div>
+            </v-subheader>
             <v-divider></v-divider>
             <v-list-item v-for="folder in folders" :key="folder.title">
               <v-list-item-avatar>
-                    <v-btn icon class="mb-1 flex-grow-1">
-                        <v-icon color="blue lighten-1">mdi-checkbox-multiple-marked-circle-outline</v-icon>
-                    </v-btn>
+                <v-tooltip top>
+                    <template v-slot:activator="{ on, attrs }">
+                        <v-btn
+                          icon
+                          medium
+                          v-bind="attrs"
+                          v-on="on"
+                        >
+                          <v-icon color="green">mdi-progress-check</v-icon>
+                        </v-btn>
+                      </template>
+                    <span>Complete task</span>
+                  </v-tooltip>
               </v-list-item-avatar>
 
               <v-list-item-content>
@@ -43,8 +75,6 @@
                 </div>
               </v-list-item-action>
             </v-list-item>
-
-            <!-- <v-divider inset></v-divider> -->
           </v-list>
         </v-col>
         <v-col cols="12" md="4" sm="12" class="bd-left">
@@ -58,6 +88,51 @@
           </div>
         </v-col>
       </v-row>
+
+        <v-dialog
+      v-model="dialog"
+      persistent
+      max-width="600px"
+    >
+     <v-card>
+         <v-card-title>
+            New Task
+          </v-card-title>
+        <v-card-text>
+          <v-container>
+            <v-row>
+              <v-col
+                cols="12"
+                sm="12"
+                md="12"
+              >
+                <v-text-field
+                  label="Task Name*"
+                  required
+                ></v-text-field>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="blue darken-1"
+            text
+            @click="dialog = false"
+          >
+            Close
+          </v-btn>
+          <v-btn
+            color="blue darken-1"
+            text
+            @click="dialog = false"
+          >
+            Save
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     </v-container>
   </div>
 </template>
@@ -68,6 +143,7 @@ import gql from 'graphql-tag'
 export default {
   data: () => {
     return {
+      dialog: false,
       project: {
         name: "Design System Model CAP 1",
         time: "00:08:19",
@@ -119,5 +195,8 @@ export default {
 }
 .time{
     line-height: 2.3rem;
+}
+.v-dialog>.v-card>.v-card__subtitle, .v-dialog>.v-card>.v-card__text {
+    padding: 0 24px 0px!important;
 }
 </style>

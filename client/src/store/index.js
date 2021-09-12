@@ -1,10 +1,12 @@
 import Vue from "vue";
 import Vuex from "vuex";
+import { user } from "./modules/user/index";
 Vue.use(Vuex)
 
 export default new Vuex.Store({
     state: {
         counter : 0,
+        user: null,
     },
     mutations: {
         increase:(state) => {
@@ -23,6 +25,6 @@ export default new Vuex.Store({
         }
     },
     modules: {
-
+        user
     }
 })

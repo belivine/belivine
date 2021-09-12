@@ -6,40 +6,26 @@ package graph
 import (
 	"context"
 	"fmt"
-	"strconv"
+	"log"
 
 	"github.com/neurocome/ine_go/graph/generated"
 	"github.com/neurocome/ine_go/graph/model"
+	"github.com/neurocome/ine_go/graph/models"
+	"github.com/neurocome/ine_go/internal/application/times"
 	"github.com/neurocome/ine_go/internal/auth"
-	links "github.com/neurocome/ine_go/internal/links"
 	"github.com/neurocome/ine_go/internal/pkg/jwt"
 	"github.com/neurocome/ine_go/internal/users"
 )
-
-func (r *mutationResolver) CreateLink(ctx context.Context, input model.NewLink) (*model.Link, error) {
-	user := auth.ForContext(ctx)
-	if user == nil {
-		return &model.Link{}, fmt.Errorf("access denied")
-	}
-
-	var link links.Link
-	link.Address = input.Address
-	link.Title = input.Title
-	link.UserID = user.ID
-	linkID := link.Save()
-	grahpqlUser := &model.User{
-		ID:   strconv.Itoa(user.ID),
-		Name: user.Username,
-	}
-
-	return &model.Link{ID: strconv.FormatInt(linkID, 10), Title: link.Title, Address: link.Address, User: grahpqlUser}, nil
-}
 
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (string, error) {
 	var user users.User
 	user.Username = input.Username
 	user.Password = input.Password
-	user.Create()
+	user.Email = input.Email
+	err := user.Create()
+	if err != nil {
+		return "", err
+	}
 	token, err := jwt.GenerateToken(user.Username)
 	if err != nil {
 		return "", err
@@ -78,18 +64,51 @@ func (r *mutationResolver) RefreshToken(ctx context.Context, input model.Refresh
 	return token, nil
 }
 
-func (r *queryResolver) Links(ctx context.Context) ([]*model.Link, error) {
-	var resultLink []*model.Link
-	var dbLinks []links.Link
-	dbLinks = links.GetAll()
-	for _, link := range dbLinks {
-		graphqlUser := &model.User{
-			ID:   strconv.Itoa(link.User.ID),
-			Name: link.User.Username,
-		}
-		resultLink = append(resultLink, &model.Link{ID: link.ID, Title: link.Title, Address: link.Address, User: graphqlUser})
+func (r *mutationResolver) CreateTime(ctx context.Context, input model.NewTime) (*models.Time, error) {
+	var time times.InputTime
+	time.Task_id = *input.TaskID
+	time.User_id = input.UserID
+	data, err := time.Create()
+	if err != nil {
+		return nil, err
 	}
-	return resultLink, nil
+	return &data, nil
+}
+
+func (r *mutationResolver) UpdateTime(ctx context.Context, input model.UpdateTime) (*models.Time, error) {
+	var time times.UpdateTime
+	time.Time_id = input.TimeID
+	data, err := time.Update()
+	if err != nil {
+		return nil, err
+	}
+	return &data, nil
+}
+
+func (r *mutationResolver) CreateTask(ctx context.Context, input *model.Task) (*models.Task, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) Time(ctx context.Context, id int64) ([]*models.Time, error) {
+	data, err := times.GetAll(id)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (r *queryResolver) GetProfile(ctx context.Context) (*model.User, error) {
+	user := auth.ForContext(ctx)
+	log.Println(user)
+	if user == nil {
+		return nil, fmt.Errorf("access denied")
+	}
+	log.Println("sdfdsfdsf")
+	data, err := users.GetProfile(user.ID)
+	if err != nil {
+		return nil, err
+	}
+	return &data, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

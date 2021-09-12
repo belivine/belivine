@@ -1,9 +1,6 @@
 package links
 
 import (
-	"log"
-
-	db "github.com/neurocome/ine_go/internal/pkg/db/pgsql"
 	"github.com/neurocome/ine_go/internal/users"
 )
 
@@ -16,19 +13,19 @@ type Link struct {
 }
 
 func (link *Link) Save() int64 {
-	id, err := db.Db.Model(link).Insert()
-	if err != nil {
-		panic(err)
-	}
-	log.Print("Row Inserted")
-	return int64(id.RowsReturned())
+	// id, err := db.Db.Model(link).Insert()
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// log.Print("Row Inserted")
+	return int64(1)
 }
 
 func GetAll() []Link {
 	link := new([]Link)
-	err := db.Db.Model(link).Relation("User").Select()
-	if err != nil {
-		panic(err)
-	}
+	// err := db.Db.Model(link).Relation("User").Select()
+	// if err != nil {
+	// panic(err)
+	// }
 	return *link
 }
